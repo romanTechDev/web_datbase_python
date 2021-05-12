@@ -1,8 +1,11 @@
+.div_inline{
+    display: inline-block;
+}
+
 .left_block{
     width: 500px;
     border: 1px solid darkorange;
     height: 1000px;
-
 }
 
 .db_title{
@@ -27,6 +30,23 @@
     margin-top: 5px;
     font-size: 23px;
 
+}
+
+.right_block{
+    vertical-align: top;
+    border: 1px solid hotpink;
+
+}
+
+.role_title{
+    padding-top: 5px;
+    padding-left: 10px;
+    font-size: 23px;
+}
+
+.table_data{
+    padding-top: 50px;
+    padding-left: 50px;
 }
 
 body{
