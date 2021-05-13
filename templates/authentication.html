@@ -8,22 +8,26 @@
 </head>
 <body>
     <div class="auth_block">
-        <h1>Авторизация</h1>
-        <img class="logo_image" src="../static/logo.png" alt="Лого">
+            <h1>Авторизация</h1>
+            <img class="logo_image" src="../static/logo.png" alt="Лого">
         <div class="inputs_block">
-        
         <form method="post">
-        <label class="login_label">
-            <input type="text" name="login_input" placeholder="Логин" size="25">
-        </label>
-            </form>
-        <form method="post">
-        <label class="password_label">
-            <input type="password" name="password_input" placeholder="Пароль" size="25">
-        </label>
+            {% for cat, msg in get_flashed_messages(True) %}
+            <div class="flash {{cat}}">{{msg}}</div>
+            {% endfor %}
+
+            <label class="login_label">
+                <input type="text" name="login_input" placeholder="Логин" size="25">
+            </label>
+
+
+            <label class="password_label">
+                <input type="password" name="password_input" placeholder="Пароль" size="25">
+            </label>
+
+            <p class="sign_button"><input type="submit" name="auth_button" value="Войти" size="25"></p>
         </form>
-        <p class="sign_button"><input type="submit" name="auth_button" value="Войти" size="25"></p>
-         </div>
+        </div>
     </div>
 </body>
 </html>

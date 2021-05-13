@@ -31,7 +31,7 @@ h1{
 
 
 .login_label{
-    padding-top: 60px;
+    padding-top: 35px;
 }
 
 .password_label{
@@ -42,6 +42,19 @@ h1{
     padding-top: 70px;
     padding-left: 140px;
     font-size: 38px;
+}
+
+.flash{
+    width:420px;
+}
+.flash.error{
+    padding-left: 45px;
+    background-color: lightcoral;
+}
+
+.flash.success{
+    padding-left: 100px;
+    background-color: darkseagreen;
 }
 
 body{
