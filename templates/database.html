@@ -8,22 +8,29 @@
 </head>
 <body>
 <div class="div_inline left_block">
-  <h1 class="db_title">База данных: {database_name}</h1>
+  <h1 class="db_title">База данных: {{database_name}}</h1>
     <h1 class="tables_title"> Таблицы </h1>
-      <dl class="all_tables_list">
-          <dd><a class="table_item"> zdanie </a></dd>
-          <dd><a class="table_item"> personal </a></dd>
-          <dd><a class="table_item"> Тест </a></dd>
-          <dd><a class="table_item"> Тест </a></dd>
-          <dd><a class="table_item"> Тест </a></dd>
-          {dd_tables}
-      </dl>
+    <form method="post">
+    <div class="all_tables_list">
+
+        <label>
+            <select name="table_name" size="40">
+                {{option_tables}}
+            </select>
+        </label>
+        <br>
+        <input type="submit" value="Выбрать">
+        </div>
+        </form>
 </div>
 <div class="div_inline right_block">
-    <h1 class="role_title"> Роль: {db_role} </h1>
+    <h1 class="role_title"> Роль: {{db_role}} </h1>
     <div class="table_data">
+
         <input type="text" value="20 Filial Ul.Profa 3">
+        {{table_view}}
     </div>
+
 </div>
 </body>
 </html>
