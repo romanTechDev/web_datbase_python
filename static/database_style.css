@@ -5,7 +5,7 @@
 .left_block{
     width: 500px;
     border: 1px solid darkorange;
-    height: 1000px;
+    height: auto;
 }
 
 .db_title{
@@ -23,19 +23,18 @@
 .all_tables_list{
     padding-top: 10px;
     padding-left: 30px;
-
+    height: 950px;
+    background-color: lightgray;
 }
 
-.table_input{
-    margin-top: 5px;
-    font-size: 23px;
-
+.table_choose_button{
+    margin-top:10px;
 }
 
 .right_block{
     vertical-align: top;
     border: 1px solid hotpink;
-
+    width:1000px
 }
 
 .role_title{
@@ -45,8 +44,52 @@
 }
 
 .table_data{
-    padding-top: 50px;
-    padding-left: 50px;
+    vertical-align: top;
+    padding-top: 10px;
+    padding-left: 10px;
+    height: 300px;
+    width: 400px;
+    border: 1px solid darkblue;
+}
+
+.table_view{
+    padding-top: 15px;
+}
+
+.table_input{
+    margin-top: 5px;
+    font-size: 23px;
+}
+
+.table_inputs{
+    padding-top: 10px;
+    padding-left: 10px;
+    height: 300px;
+    width: 400px;
+    border: 1px solid chartreuse;
+}
+
+.button{
+    margin-left: 20px;
+}
+
+.table_item{
+
+}
+
+.flash.success{
+    padding-top: 10px;
+    padding-left: 10px;
+    width: 300px;
+    background-color: darkseagreen;
+}
+
+.table_name_title{
+    font-size: 22px;
+}
+
+.id_row_title{
+    font-size: 22px;
 }
 
 body{

@@ -2,6 +2,7 @@ import pymysql.connections
 
 DATABASENAME = 'photocenter'
 
+user_role = ''
 
 def connect_to_base():
     try:
@@ -9,6 +10,7 @@ def connect_to_base():
         return connected_data_base
     except pymysql.Error:
         print('Данные в подключении не верны/ Не подключен веб сервер !')
+
 
 class DataBaseNetwork:  # Работа с данными в базе данных
 
@@ -18,8 +20,11 @@ class DataBaseNetwork:  # Работа с данными в базе данны�
 
     def execute_to_base(self, sql_request):
         try:
+            print(f'execute_to_base  {sql_request}')
             self.cursor.execute(sql_request)
             self.connected_data_base.commit()
+
+            print('УСПЕШНАЯ ЗАПИСЬ !')
         except pymysql.Error:
             print('execute_to_base', 'Данные в запросе не вверны !')
 
@@ -27,10 +32,11 @@ class DataBaseNetwork:  # Работа с данными в базе данны�
         try:
             self.cursor.execute(sql_request)
             rows = self.cursor.fetchall()
+            self.connected_data_base.commit()
             return rows
         except pymysql.Error:
             print('get_rows_from_base',
-                                 f'Данные в запросе не вверны !{sql_request}')
+                  f'Данные в запросе не вверны !{sql_request}')
 
     def get_columns_table(self, table):
 
@@ -46,13 +52,18 @@ class DataBaseNetwork:  # Работа с данными в базе данны�
 
         return rows
 
+    def get_role_user(self, user):
+        rows = self.get_rows_from_base("SELECT clientroles.Namerole FROM clientauth "
+                                       "RIGHT JOIN clientroles on clientauth.ID_Clientroles = clientroles"
+                                       f".ID_clientroles WHERE clientauth.Clientlogin = '{user}'")
+        return rows
+
     def add_row(self, table, columns_array, values_array):
 
         columns = ','.join(columns_array)
         values = "'" + "','".join(values_array) + "'"
 
         self.execute_to_base(f'INSERT INTO {table}({columns}) VALUES({values})')
-        print(f'db_add_row', f'УСПЕШНАЯ ЗАПИСЬ !\nINSERT INTO {table}({columns}) VALUES({values})')
 
     def add_row_hash(self, table, columns_array, hash_sums_array):
 
@@ -74,7 +85,7 @@ class DataBaseNetwork:  # Работа с данными в базе данны�
         self.execute_to_base(f'UPDATE {table} SET {data[0:-1]} WHERE ID_{table} = "{id_row}"')
 
         print(f'db_modify_row', f'УСПЕШНАЯ ЗАПИСЬ !\nUPDATE {table} SET {data[0:-1]} '
-                                              f'WHERE ID_{table} = "{id_row}"')
+                                f'WHERE ID_{table} = "{id_row}"')
 
     def delete_row(self, table, id_row):
 

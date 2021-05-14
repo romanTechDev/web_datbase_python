@@ -12,25 +12,42 @@
     <h1 class="tables_title"> Таблицы </h1>
     <form method="post">
     <div class="all_tables_list">
-
         <label>
             <select name="table_name" size="40">
                 {{option_tables}}
             </select>
         </label>
         <br>
-        <input type="submit" value="Выбрать">
-        </div>
-        </form>
+        <input class="table_choose_button" type="submit" value="Выбрать">
+    </div>
+    </form>
 </div>
 <div class="div_inline right_block">
     <h1 class="role_title"> Роль: {{db_role}} </h1>
-    <div class="table_data">
+    {% for cat, msg in get_flashed_messages(True) %}
+            <div class="flash {{cat}}">{{msg}}</div>
+    {% endfor %}
+   <form method="post">
+    <div class="div_inline table_data">
+        <h1 class="table_name_title"> {{table_name}} </h1>
+        <label>
+            <select name="table_view" size="10">
 
-        <input type="text" value="20 Filial Ul.Profa 3">
-        {{table_view}}
+                {{table_view}}
+            </select>
+        </label>
+    </div>
+    <div class="div_inline table_inputs">
+        <h1 class="id_row_title">{{id_row}}</h1>
+        {{table_inputs}}
+        {{add_input}}
+        {{access_input}}
     </div>
 
+    <div class="button">
+        {{buttons}}
+    </div>
+    </form>
 </div>
 </body>
 </html>
