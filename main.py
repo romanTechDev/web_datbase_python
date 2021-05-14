@@ -1,19 +1,18 @@
-from flask import Flask, request, render_template, flash, redirect, url_for, Markup
-from flask_login import LoginManager, login_user, login_required, UserMixin
+from flask import Flask, request, render_template, flash, redirect, Markup
+# from flask_login import LoginManager, login_user, login_required, UserMixin
 import hashlib
-import pymysql
+
+import traceback
 
 import DataBase_Networks
-from DataBase_Networks import connect_to_base
 from DataBase_Networks import DataBaseNetwork
 import Note
-from UserLogin import UserLogin
+
+# from UserLogin import UserLogin
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'jijwiajdiwaj9ji2j2hhnwa989jkmxzlpppwq2'
 # login_manager = LoginManager(app)
-
-connect_to_base()
 
 db_network = DataBaseNetwork()
 
@@ -83,17 +82,14 @@ def database(alias):
 
 
 class DataBaseWorks:
-    pass
-
-    def __init__(self):
+    def __init__(self, request):
         self.table_view = Note.table_view_markup
-        self.table_name = Note.table_name
+        self.table_name = request.form['table_name']
         self.table_inputs = Note.table_inputs_markup
         self.add_button = Note.add_button_markup
         self.buttons = Note.buttons_markup
         self.id_row = Note.id_row
         self.access_input = Note.access_input_markup
-        pass
 
     def delete_row(self):  # Удаление строки таблицы
         try:
@@ -179,108 +175,49 @@ class DataBaseWorks:
         Note.buttons_markup = ''
         Note.id_row = ''
         Note.access_input_markup = ''
-        pass
+
+
+def return_request_template(request):
+    tables = ''
+    for row in db_network.get_rows_from_base('show tables'):
+        tables += f'<option class="table_item" size="40"> {row[0]} </option>\n'
+
+    db_role = DataBase_Networks.user_role
+    database_name = DataBase_Networks.DATABASENAME
+
+    option_tables = Markup(tables)
+    table_view = Note.table_view_markup
+    table_name = request.form.get('table_name', '')
+    table_inputs = Note.table_inputs_markup
+    add_input = Note.add_button_markup
+    buttons = Note.buttons_markup
+    id_row = Note.id_row
+    access_input = Note.access_input_markup
+
+    return render_template('database.html', option_tables=option_tables, database_name=database_name,
+                           db_role=db_role, table_view=table_view, table_name=table_name, buttons=buttons,
+                           table_inputs=table_inputs, add_input=add_input, id_row=id_row, access_input=access_input)
 
 
 @app.route('/database.html', methods=['POST', 'GET'])
 def database():
     if request.method == "POST":
 
-        try:  # Выбор таблицы и дальнейшая обработка
-            if request.form['table_name']:
-                Note.table_name = request.form['table_name']
+        try:  # Выбор режима изменения строки
+            if request.form.get('modify_button', '') and request.form.get('table_view', ''):
+                table_name = request.form['table_name']
+                print(table_name)
 
-                data = ''
-                table_inputs = ''
-                counter = 0
-
-                for row in db_network.get_rows_from_base(
-                        f'select * from {Note.table_name}'):  # Данные таблицы для select
-                    data += f'<option class="data_item"> {row} </option>'
-
-                Note.table_view_markup = Markup(data)
-
-                for column in db_network.get_columns_table(Note.table_name):  # Поля ввода данных в таблицу
-                    if counter == 0:
-                        counter += 1
-                        continue
-                    table_inputs += f'<input type=text class="table_input" name="data_input" placeholder="{column}">'
-
-                add_button = '<input type="submit" class="button" name="add_button" value="Добавить запись">'
-
-                Note.table_inputs_markup = Markup(table_inputs)
-                Note.add_button_markup = Markup(add_button)
-
-                buttons = '<input type="submit" class="button" name="delete_button" value="Удалить запись"> ' \
-                          '<input type="submit" class="button" name="modify_button" value="Изменить запись"> '
-                Note.buttons_markup = Markup(buttons)
-
-                return redirect('database.html')
-        except Exception:
-            print('Table has not choose !')
-
-        try:  # Удаление строки таблицы
-            if request.form['delete_button']:
-                row = request.form['table_view']
-                row = row.split(',')
-                print(row)
-                id_row = row[0][1:]  # Срезать скобку первого элемента
-
-                print('Click to delete ! ' + f"Data to delete {id_row}")
-
-                db_network.delete_row(Note.table_name, id_row)
-
-                Note.table_inputs_markup = None
-                Note.table_view_markup = None
-                Note.buttons_markup = None
-                flash('Опперация успешно выполнена !', category='success')
-                return redirect('database.html')
-        except Exception:
-            print('Delete has not posted')
-
-        try:  # Изменение строки таблицы
-
-            try:
-                if request.form['access_modify']:
-                    data_array = request.form.getlist('data_input')
-                    print(f'Click to modify ! Your Data please work with it {data_array}')
-
-                    data_to_request = []
-
-                    i = 0
-                    counter = 0
-
-                    for column in db_network.get_columns_table(Note.table_name):
-                        if counter == 0:
-                            counter += 1
-                            continue
-                        data_to_request.append(column)
-                        while i != len(data_array):
-                            data_to_request.append(data_array[i])
-                            i += 1
-                            break
-
-                    print(data_to_request)
-                    db_network.modify_row(Note.table_name, data_to_request, Note.id_row)
-
-                    return redirect('database.html')
-            except Exception:
-                print('Не нажата кнопка подтверждения !!')
-
-            if request.form['modify_button'] and request.form['table_view']:
-                print(Note.table_name)
-
-                row = request.form['table_view']
+                row = request.form.get('table_view', '')
                 row = row.split(',')
                 id_row = row[0][1:]  # Срезать скобку первого элемента
                 Note.id_row = id_row
                 i = 0
                 table_inputs = ''
                 db_row = db_network.get_rows_from_base(
-                    f'select * from {Note.table_name} where ID_{Note.table_name} = "{id_row}"')[0]
+                    f'select * from {table_name} where ID_{table_name} = "{id_row}"')[0]
 
                 while i != len(db_row):  # Поля ввода данных в таблицу
-                    print(db_row[i])
                     if i == 0:
                         i += 1
                         continue
@@ -289,75 +226,64 @@ def database():
 
                 Note.table_inputs_markup = Markup(table_inputs)
 
-                access_input = '<input type="submit" name="access_modify" value="Изменить">'
+                access_input = '<input type="submit" class="add_button" name="access_modify" value="Изменить">'
                 Note.access_input_markup = Markup(access_input)
-                Note.add_button_markup = None
+                Note.add_button_markup = ''
 
-                return redirect('database.html')
-
+                print(Note.table_inputs_markup)
+                return return_request_template(request)
         except Exception:
+            traceback.print_exc()
             print('Modify has not posted or row wasnt choose !!')
 
-        try:  # Добавление строки таблицы
-            if request.form['add_button']:
-                data_array = request.form.getlist('data_input')
+        db_works = DataBaseWorks(request)
 
-                print(f'Click to add ! Your Data please work with it {data_array}')
+        db_works.delete_row()
+        db_works.modify_row()
+        db_works.add_row()
 
-                all_columns = db_network.get_columns_table(Note.table_name)[1:]
+        try:  # Выбор таблицы и дальнейшая обработка
+            if request.form['table_name']:
 
-                if Note.table_name == 'clientauth':
-                    hash_data_to_request = []
-                    i = 0
+                data = ''
+                table_inputs = ''
+                counter = 0
+                table_name = request.form['table_name']
 
-                    while i != len(data_array):
-                        if i == len(data_array) - 1:
-                            hash_data_to_request.append(data_array[i])
-                            i += 1
-                        else:
-                            byte_data = data_array[i].encode('utf-8')
-                            hash_obj = hashlib.sha256(byte_data).hexdigest()
-                            hash_data_to_request.append(hash_obj)
-                            i += 1
+                for row in db_network.get_rows_from_base(
+                        f'select * from {table_name}'):  # Данные таблицы для select
+                    data += f'<option class="data_item"> {row} </option>'
 
-                        print(hash_data_to_request)
-                    db_network.add_row_hash(Note.table_name, all_columns, hash_data_to_request)
-                else:
-                    data_to_request = []
-                    for data in data_array:
-                        data_to_request.append(data)
+                Note.table_view_markup = Markup(data)
 
-                    db_network.add_row(Note.table_name, all_columns, data_to_request)
+                for column in db_network.get_columns_table(table_name):  # Поля ввода данных в таблицу
+                    if counter == 0:
+                        counter += 1
+                        continue
+                    table_inputs += f'<input type=text class="table_input" name="data_input" placeholder="{column}">'
 
-                    Note.table_inputs_markup = None
-                    Note.table_view_markup = None
-                    Note.buttons_markup = None
-                    flash('Опперация успешно выполнена !', category='success')
+                add_button = '<input type="submit" class="add_button" name="add_button" value="Добавить запись">'
+
+                Note.table_inputs_markup = Markup(table_inputs)
+                Note.add_button_markup = Markup(add_button)
+
+                buttons = '<input type="submit" class="buttons" name="delete_button" value="Удалить запись"> ' \
+                          '<input type="submit" class="buttons" name="modify_button" value="Изменить запись"> '
+                Note.buttons_markup = Markup(buttons)
+
+
+                return return_request_template(request)
         except Exception:
-            print('Add has not posted')
+            traceback.print_exc()
+            print('Table has not choose !')
 
-        return redirect('database.html')
+
+
+
+        return return_request_template(request)
 
     else:  # Загрузка страницы
-        tables = ''
-        for row in db_network.get_rows_from_base('show tables'):
-            tables += f'<option class="table_item" size="40"> {row[0]} </option>\n'
-
-        db_role = DataBase_Networks.user_role
-        database_name = DataBase_Networks.DATABASENAME
-
-        option_tables = Markup(tables)
-        table_view = Note.table_view_markup
-        table_name = Note.table_name
-        table_inputs = Note.table_inputs_markup
-        add_input = Note.add_button_markup
-        buttons = Note.buttons_markup
-        id_row = Note.id_row
-        access_input = Note.access_input_markup
-
-        return render_template('database.html', option_tables=option_tables, database_name=database_name,
-                               db_role=db_role, table_view=table_view, table_name=table_name, buttons=buttons,
-                               table_inputs=table_inputs, add_input=add_input, id_row=id_row, access_input=access_input)
+        return return_request_template(request)
 
 
 if __name__ == '__main__':

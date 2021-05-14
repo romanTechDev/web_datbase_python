@@ -4,6 +4,7 @@ DATABASENAME = 'photocenter'
 
 user_role = ''
 
+
 def connect_to_base():
     try:
         connected_data_base = pymysql.connect(user='root', password='root', host='localhost', database=DATABASENAME)

@@ -69,8 +69,15 @@
     border: 1px solid chartreuse;
 }
 
-.button{
+
+
+.add_button{
+    margin-top: 20px;
     margin-left: 20px;
+}
+
+.buttons{
+    margin-left: 10px;
 }
 
 .table_item{
